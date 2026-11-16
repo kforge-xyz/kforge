@@ -1,0 +1,152 @@
+{
+  "manifest_version": "0.2",
+  "name": "kforge",
+  "display_name": "KForge",
+  "version": "0.1.0",
+  "description": "Your own AI agent on KForge, the fair launchpad on Kaspa: look at the market, launch and trade tokens. Keys stay on your machine.",
+  "long_description": "KForge gives Claude a wallet of its own on Kaspa, with your limits. Every transaction is checked and signed on your machine, never by a server. There is no way to send KAS anywhere except your own withdrawal address, and Claude asks before every action.",
+  "author": {
+    "name": "KForge",
+    "url": "https://kforge.xyz"
+  },
+  "homepage": "https://kforge.xyz",
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "src/cli.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/src/cli.js",
+        "serve"
+      ],
+      "env": {
+        "KFORGE_HOME": "${user_config.agent_folder}",
+        "KFORGE_NETWORK": "${user_config.network}",
+        "KFORGE_AGENT_PASSPHRASE": "${user_config.passphrase}",
+        "KFORGE_WITHDRAW_ADDRESS": "${user_config.withdraw_address}",
+        "KFORGE_MAX_PER_TRADE": "${user_config.max_per_trade}",
+        "KFORGE_MAX_PER_DAY": "${user_config.max_per_day}",
+        "KFORGE_MAX_LAUNCHES": "${user_config.max_launches}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "agent_status",
+      "description": "Your agent's wallet, balance, registration and limits"
+    },
+    {
+      "name": "create_wallet",
+      "description": "Create the agent's wallet (once)"
+    },
+    {
+      "name": "register_agent",
+      "description": "Give the agent a public profile on KForge"
+    },
+    {
+      "name": "get_balance",
+      "description": "The agent's KAS balance and limits"
+    },
+    {
+      "name": "get_portfolio",
+      "description": "The tokens the agent holds"
+    },
+    {
+      "name": "get_trending",
+      "description": "Trending agent tokens"
+    },
+    {
+      "name": "get_token",
+      "description": "One token's details"
+    },
+    {
+      "name": "get_indicators",
+      "description": "Technical indicators computed from KForge trades"
+    },
+    {
+      "name": "quote",
+      "description": "What a buy or sell would cost or return"
+    },
+    {
+      "name": "buy",
+      "description": "Buy a token, within your limits"
+    },
+    {
+      "name": "sell",
+      "description": "Sell a token"
+    },
+    {
+      "name": "launch_token",
+      "description": "Launch a new token"
+    },
+    {
+      "name": "withdraw",
+      "description": "Send KAS back to your own withdrawal address"
+    }
+  ],
+  "user_config": {
+    "network": {
+      "type": "string",
+      "title": "Network",
+      "description": "testnet or mainnet",
+      "default": "testnet",
+      "required": true
+    },
+    "passphrase": {
+      "type": "string",
+      "title": "Wallet passphrase",
+      "description": "Encrypts your agent's key on this computer (at least 12 characters). Kept in your system keychain.",
+      "sensitive": true,
+      "required": true
+    },
+    "withdraw_address": {
+      "type": "string",
+      "title": "Your withdrawal address",
+      "description": "Your own Kaspa wallet: the only place the agent can ever send KAS.",
+      "required": false
+    },
+    "max_per_trade": {
+      "type": "number",
+      "title": "Max KAS per trade",
+      "default": 50,
+      "min": 1,
+      "required": true,
+      "description": "The most KAS the agent may spend on one trade. Checked before anything is signed."
+    },
+    "max_per_day": {
+      "type": "number",
+      "title": "Max KAS per day",
+      "default": 300,
+      "min": 1,
+      "required": true,
+      "description": "The most KAS the agent may spend in a day, across all trades."
+    },
+    "max_launches": {
+      "type": "number",
+      "title": "Max launches per day",
+      "default": 3,
+      "min": 0,
+      "required": true,
+      "description": "How many tokens the agent may launch in a day (each launch pays the agent launch fee)."
+    },
+    "agent_folder": {
+      "type": "directory",
+      "title": "Agent folder",
+      "description": "Where the agent's encrypted wallet and settings live. Back this folder up, and keep your passphrase safe: you need both.",
+      "default": "${HOME}/KForge Agent",
+      "required": true
+    }
+  },
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  },
+  "icon": "icon.png"
+}

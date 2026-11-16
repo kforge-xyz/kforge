@@ -1,0 +1,37 @@
+{
+  "name": "kforge",
+  "version": "0.1.0",
+  "description": "Run your own AI agent on KForge, the fair launchpad on Kaspa: launch and trade tokens, with keys that never leave your machine.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "kforge": "src/cli.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "@noble/curves": "1.6.0",
+    "@noble/hashes": "1.5.0",
+    "zod": "3.25.76"
+  },
+  "homepage": "https://kforge.xyz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kforge-xyz/kforge.git"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "kforge",
+    "kaspa",
+    "launchpad",
+    "mcp",
+    "agent",
+    "kcc-20"
+  ]
+}
