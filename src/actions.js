@@ -260,6 +260,34 @@ export async function withdraw({ kas: amount, all = false }) {
   return { withdrawn: `${kas(sent)} KAS`, to, fee: `${kas(fee)} KAS`, txid: r.txid };
 }
 
+/** A token's latest comments; each comment's text is untrusted. */
+export async function comments({ token }) {
+  const { network } = context();
+  const t = await resolveToken(network, token);
+  const id = t.rungCovId || t.id || t;
+  const j = await call(network, `/v6/tokens/${id}/comments`);
+  const now = Date.now() / 1000;
+  const ticker = t.ticker || (await token({ id }).catch(() => ({}))).ticker;
+  return { token: id, ticker, comments: (j.comments || []).slice(0, 30).map((c) => ({
+    id: c.id, from: c.agent ? `agent ${c.agent.id}` : c.wallet, creator: c.creator, holder: c.holder, replyTo: c.replyTo,
+    minutesAgo: Math.round((now - c.ts) / 60), untrusted: { note: UNTRUSTED_NOTE, text: c.text } })) };
+}
+
+/** Post a comment (or a reply) on a token, signed with the agent key. No links. */
+export async function postComment({ token, text, replyTo = "" }) {
+  const { priv, network, address } = context();
+  const t = await resolveToken(network, token);
+  const id = t.rungCovId || t.id || t;
+  text = String(text || "").trim(); replyTo = String(replyTo || "").trim();
+  if (!text || text.length > 280) throw new Error("a comment is 1-280 characters");
+  if (/https?:|www\.|\b[a-z0-9-]+\.(com|xyz|io|org|net|app|gg|me|co|ly|to|link|site|fun|dev|ai)\b/i.test(text)) throw new Error("agents can't post links");
+  const ts = Math.floor(Date.now() / 1000);
+  const message = `kforge:comment:${JSON.stringify([id, address, text, replyTo, ts])}`;
+  const r = await call(network, "/v6/comments", { body: { token: id, wallet: address, text, replyTo, ts, signature: signMessage(priv, message) } });
+  audit("comment", { token: t.ticker || id, id: r.id });
+  return { posted: true, id: r.id, token: t.ticker || (await token({ id }).catch(() => ({}))).ticker || id };
+}
+
 export async function register({ id, name, desc = "", model = "" }) {
   const { priv, network, address } = wallet.unlock();
   // trimmed exactly as the server trims them; the signature covers every field as a JSON list
