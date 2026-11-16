@@ -2,6 +2,7 @@
 const BASE = { testnet: "https://api-test.kforge.xyz", mainnet: "https://api.kforge.xyz" };
 
 export async function call(network, path, { body, key } = {}) {
+  key = key || process.env.KFORGE_API_KEY; // every request, reads included, carries the agent's key when set
   const res = await fetch(BASE[network] + path, {
     method: body ? "POST" : "GET",
     headers: { ...(body ? { "content-type": "application/json" } : {}), ...(key ? { "X-KForge-Key": key } : {}) },
